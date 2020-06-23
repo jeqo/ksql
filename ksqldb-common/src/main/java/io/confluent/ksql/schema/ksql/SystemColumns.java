@@ -28,12 +28,16 @@ public final class SystemColumns {
   public static final ColumnName ROWTIME_NAME = ColumnName.of("ROWTIME");
   public static final SqlType ROWTIME_TYPE = SqlTypes.BIGINT;
 
+  public static final ColumnName ROWHEADERS_NAME = ColumnName.of("ROWHEADERS");
+  public static final SqlType ROWHEADERS_TYPE = SqlTypes.map(SqlTypes.STRING);
+
   public static final ColumnName WINDOWSTART_NAME = ColumnName.of("WINDOWSTART");
   public static final ColumnName WINDOWEND_NAME = ColumnName.of("WINDOWEND");
   public static final SqlType WINDOWBOUND_TYPE = SqlTypes.BIGINT;
 
   private static final Set<ColumnName> PSEUDO_COLUMN_NAMES = ImmutableSet.of(
-      ROWTIME_NAME
+      ROWTIME_NAME,
+      ROWHEADERS_NAME
   );
 
   private static final Set<ColumnName> WINDOW_BOUNDS_COLUMN_NAMES = ImmutableSet.of(

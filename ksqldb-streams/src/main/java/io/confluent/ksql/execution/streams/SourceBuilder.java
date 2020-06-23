@@ -37,14 +37,18 @@ import io.confluent.ksql.schema.ksql.LogicalSchema;
 import io.confluent.ksql.schema.ksql.PhysicalSchema;
 import io.confluent.ksql.serde.WindowInfo;
 import io.confluent.ksql.util.KsqlConfig;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.ConfigException;
+import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.connect.data.Field;
@@ -283,7 +287,7 @@ public final class SourceBuilder {
         .stream(streamSource.getTopicName(), consumed);
 
     return stream
-        .transformValues(new AddKeyAndTimestampColumns<>(keyGenerator));
+        .transformValues(new AddKeyAndSystemColumns<>(keyGenerator));
   }
 
   private static <K> KTable<K, GenericRow> buildKTable(
@@ -297,7 +301,7 @@ public final class SourceBuilder {
         .table(streamSource.getTopicName(), consumed, materialized);
 
     return table
-        .transformValues(new AddKeyAndTimestampColumns<>(keyGenerator));
+        .transformValues(new AddKeyAndSystemColumns<>(keyGenerator));
   }
 
   private static TimestampExtractor timestampExtractor(
@@ -397,12 +401,12 @@ public final class SourceBuilder {
     };
   }
 
-  private static class AddKeyAndTimestampColumns<K>
+  private static class AddKeyAndSystemColumns<K>
       implements ValueTransformerWithKeySupplier<K, GenericRow, GenericRow> {
 
     private final Function<K, Collection<?>> keyGenerator;
 
-    AddKeyAndTimestampColumns(final Function<K, Collection<?>> keyGenerator) {
+    AddKeyAndSystemColumns(final Function<K, Collection<?>> keyGenerator) {
       this.keyGenerator = requireNonNull(keyGenerator, "keyGenerator");
     }
 
@@ -423,10 +427,15 @@ public final class SourceBuilder {
           }
 
           final long timestamp = processorContext.timestamp();
+          final Map<String, String> headers = new HashMap<>();
+          for (Header header : processorContext.headers()) {
+            headers.put(header.key(), new String(header.value(), StandardCharsets.UTF_8));
+          }
           final Collection<?> keyColumns = keyGenerator.apply(key);
 
-          row.ensureAdditionalCapacity(1 + keyColumns.size());
+          row.ensureAdditionalCapacity(2 + keyColumns.size());
           row.append(timestamp);
+          row.append(headers);
           row.appendAll(keyColumns);
           return row;
         }

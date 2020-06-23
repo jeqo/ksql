@@ -27,6 +27,8 @@ import io.confluent.ksql.execution.streams.materialization.TableRowValidation.Va
 import io.confluent.ksql.name.ColumnName;
 import io.confluent.ksql.schema.ksql.LogicalSchema;
 import io.confluent.ksql.schema.ksql.types.SqlTypes;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -56,6 +58,7 @@ public class RowTest {
 
   private static final GenericRow A_VALUE = GenericRow.genericRow("v0-v", 1.0d);
   private static final long A_ROWTIME = 1283535L;
+  private static final Map<String, String> A_ROWHEADERS = new HashMap<>();
 
   @Mock
   private Validator validator;
@@ -103,7 +106,7 @@ public class RowTest {
   @Test
   public void shouldValidateOnConstruction() {
     // When:
-    new Row(SCHEMA, A_KEY, A_VALUE, A_ROWTIME, validator);
+    new Row(SCHEMA, A_KEY, A_VALUE, A_ROWTIME, A_ROWHEADERS, validator);
 
     // Then:
     verify(validator).validate(SCHEMA, A_KEY, A_VALUE);
@@ -113,7 +116,7 @@ public class RowTest {
   @Test
   public void shouldValidateOnCopy() {
     // Given:
-    final Row row = new Row(SCHEMA, A_KEY, A_VALUE, A_ROWTIME, validator);
+    final Row row = new Row(SCHEMA, A_KEY, A_VALUE, A_ROWTIME, A_ROWHEADERS, validator);
     clearInvocations(validator);
 
     // When:

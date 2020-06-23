@@ -21,6 +21,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.confluent.ksql.GenericRow;
 import io.confluent.ksql.execution.streams.materialization.TableRowValidation.Validator;
 import io.confluent.ksql.schema.ksql.LogicalSchema;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.kafka.connect.data.Struct;
@@ -31,15 +33,26 @@ public final class Row implements TableRow {
   private final Struct key;
   private final GenericRow value;
   private final long rowTime;
+  private final Map<String, String> headers;
   private final Validator validator;
+
+  public static Row of(
+          final LogicalSchema schema,
+          final Struct key,
+          final GenericRow value,
+          final long rowTime
+  ) {
+    return Row.of(schema, key, value, rowTime, new HashMap<>());
+  }
 
   public static Row of(
       final LogicalSchema schema,
       final Struct key,
       final GenericRow value,
-      final long rowTime
+      final long rowTime,
+      final Map<String, String> headers
   ) {
-    return new Row(schema, key, value, rowTime, TableRowValidation::validate);
+    return new Row(schema, key, value, rowTime, headers, TableRowValidation::validate);
   }
 
   @VisibleForTesting
@@ -48,12 +61,14 @@ public final class Row implements TableRow {
       final Struct key,
       final GenericRow value,
       final long rowTime,
+      final Map<String, String> headers,
       final Validator validator
   ) {
     this.schema = requireNonNull(schema, "schema");
     this.key = requireNonNull(key, "key");
     this.value = requireNonNull(value, "value");
     this.rowTime = rowTime;
+    this.headers = requireNonNull(headers, "headers");
     this.validator = requireNonNull(validator, "validator");
 
     validator.validate(schema, key, value);
@@ -94,6 +109,7 @@ public final class Row implements TableRow {
         key,
         newValue,
         rowTime,
+        headers,
         validator
     );
   }
@@ -110,12 +126,13 @@ public final class Row implements TableRow {
     return Objects.equals(schema, that.schema)
         && Objects.equals(key, that.key)
         && Objects.equals(value, that.value)
-        && Objects.equals(rowTime, that.rowTime);
+        && Objects.equals(rowTime, that.rowTime)
+        && Objects.equals(headers, that.headers);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(schema, key, value, rowTime);
+    return Objects.hash(schema, key, value, rowTime, headers);
   }
 
   @Override
@@ -124,6 +141,7 @@ public final class Row implements TableRow {
         + "key=" + key
         + ", value=" + value
         + ", rowTime=" + rowTime
+        + ", headers=" + headers
         + ", schema=" + schema
         + '}';
   }
