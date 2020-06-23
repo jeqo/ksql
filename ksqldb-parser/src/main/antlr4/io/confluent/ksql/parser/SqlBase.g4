@@ -91,7 +91,7 @@ tableElements
     ;
 
 tableElement
-    : identifier type ((PRIMARY)? KEY)?
+    : identifier type ((PRIMARY)? KEY)? (HEADER)?
     ;
 
 tableProperties
@@ -463,6 +463,7 @@ NAMESPACE: 'NAMESPACE';
 MATERIALIZED: 'MATERIALIZED';
 VIEW: 'VIEW';
 PRIMARY: 'PRIMARY';
+HEADER: 'HEADER';
 
 IF: 'IF';
 
