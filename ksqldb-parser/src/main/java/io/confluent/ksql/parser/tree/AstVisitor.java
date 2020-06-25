@@ -180,4 +180,8 @@ public abstract class AstVisitor<R, C> {
   public R visitDropType(final DropType node, final C context) {
     return visitStatement(node, context);
   }
+
+  public R visitWithHeaders(final WithHeaders node, final C context) {
+    return visitNode(node, context);
+  }
 }

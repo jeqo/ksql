@@ -52,6 +52,7 @@ import io.confluent.ksql.parser.tree.SingleColumn;
 import io.confluent.ksql.parser.tree.Sink;
 import io.confluent.ksql.parser.tree.Table;
 import io.confluent.ksql.parser.tree.WindowExpression;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import io.confluent.ksql.planner.plan.JoinNode;
 import io.confluent.ksql.schema.ksql.SystemColumns;
 import io.confluent.ksql.schema.utils.FormatOptions;
@@ -245,6 +246,7 @@ class Analyzer {
       node.getPartitionBy().ifPresent(this::analyzePartitionBy);
       node.getWindow().ifPresent(this::analyzeWindowExpression);
       node.getHaving().ifPresent(this::analyzeHaving);
+      node.getWithHeaders().ifPresent(this::analyzeWithHeaders);
       node.getLimit().ifPresent(analysis::setLimitClause);
 
       process(node.getSelect(), context);
@@ -277,6 +279,11 @@ class Analyzer {
 
       analysis.getHavingExpression()
           .ifPresent(expression -> columnValidator.analyzeExpression(expression, "HAVING"));
+
+      analysis.getWithHeaders()
+          .map(WithHeaders::getWithHeaderExpressions)
+          .orElseGet(ImmutableList::of)
+          .forEach(expression -> columnValidator.analyzeExpression(expression, "WITH HEADERS"));
 
       analysis.getSelectItems().stream()
           .filter(si -> si instanceof SingleColumn)
@@ -544,6 +551,10 @@ class Analyzer {
 
     private void analyzeHaving(final Expression node) {
       analysis.setHavingExpression(node);
+    }
+
+    private void analyzeWithHeaders(final WithHeaders withHeaders) {
+      analysis.setWithHeaders(withHeaders);
     }
 
     private void validateSelect(final SingleColumn column) {

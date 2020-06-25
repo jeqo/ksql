@@ -35,6 +35,7 @@ import io.confluent.ksql.execution.plan.StreamFlatMap;
 import io.confluent.ksql.execution.plan.StreamGroupBy;
 import io.confluent.ksql.execution.plan.StreamGroupByKey;
 import io.confluent.ksql.execution.plan.StreamSelect;
+import io.confluent.ksql.execution.plan.StreamWithHeaders;
 import io.confluent.ksql.execution.plan.StreamSink;
 import io.confluent.ksql.execution.plan.StreamStreamJoin;
 import io.confluent.ksql.execution.plan.StreamTableJoin;
@@ -63,7 +64,7 @@ public class SchemaKStream<K> {
 
   private static final String GROUP_BY_COLUMN_SEPARATOR = "|+|";
 
-  public enum Type { SOURCE, PROJECT, FILTER, AGGREGATE, SINK, REKEY, JOIN }
+  public enum Type {SOURCE, PROJECT, FILTER, AGGREGATE, SINK, REKEY, JOIN}
 
   final KeyFormat keyFormat;
   final KsqlConfig ksqlConfig;
@@ -412,6 +413,20 @@ public class SchemaKStream<K> {
         sourceStep,
         tableFunctions
     );
+    return new SchemaKStream<>(
+        step,
+        resolveSchema(step),
+        keyFormat,
+        ksqlConfig,
+        functionRegistry);
+  }
+
+  public SchemaKStream<K> withHeaders(
+      final List<Expression> headerExpressions,
+      final QueryContext.Stacker contextStacker
+  ) {
+    StreamWithHeaders<K> step = ExecutionStepFactory
+        .streamSelectHeaders(contextStacker, sourceStep, headerExpressions);
     return new SchemaKStream<>(
         step,
         resolveSchema(step),

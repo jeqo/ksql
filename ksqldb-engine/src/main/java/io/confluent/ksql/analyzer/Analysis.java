@@ -36,6 +36,7 @@ import io.confluent.ksql.parser.tree.PartitionBy;
 import io.confluent.ksql.parser.tree.ResultMaterialization;
 import io.confluent.ksql.parser.tree.SelectItem;
 import io.confluent.ksql.parser.tree.WindowExpression;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import io.confluent.ksql.parser.tree.WithinExpression;
 import io.confluent.ksql.planner.plan.JoinNode;
 import io.confluent.ksql.planner.plan.JoinNode.JoinType;
@@ -69,6 +70,7 @@ public class Analysis implements ImmutableAnalysis {
   private Optional<PartitionBy> partitionBy = Optional.empty();
   private Optional<WindowExpression> windowExpression = Optional.empty();
   private Optional<Expression> havingExpression = Optional.empty();
+  private Optional<WithHeaders> withHeaders = Optional.empty();
   private OptionalInt limitClause = OptionalInt.empty();
   private CreateSourceAsProperties withProperties = CreateSourceAsProperties.none();
   private final List<FunctionCall> tableFunctions = new ArrayList<>();
@@ -160,6 +162,15 @@ public class Analysis implements ImmutableAnalysis {
 
   void setPartitionBy(final PartitionBy partitionBy) {
     this.partitionBy = Optional.of(partitionBy);
+  }
+
+  @Override
+  public Optional<WithHeaders> getWithHeaders() {
+    return withHeaders;
+  }
+
+  void setWithHeaders(final WithHeaders withHeaders) {
+    this.withHeaders = Optional.of(withHeaders);
   }
 
   @Override

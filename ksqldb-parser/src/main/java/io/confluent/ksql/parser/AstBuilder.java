@@ -85,6 +85,7 @@ import io.confluent.ksql.parser.SqlBaseParser.SourceNameContext;
 import io.confluent.ksql.parser.SqlBaseParser.TablePropertiesContext;
 import io.confluent.ksql.parser.SqlBaseParser.TablePropertyContext;
 import io.confluent.ksql.parser.SqlBaseParser.WindowUnitContext;
+import io.confluent.ksql.parser.SqlBaseParser.WithHeadersContext;
 import io.confluent.ksql.parser.properties.with.CreateSourceAsProperties;
 import io.confluent.ksql.parser.properties.with.CreateSourceProperties;
 import io.confluent.ksql.parser.tree.AliasedRelation;
@@ -137,6 +138,7 @@ import io.confluent.ksql.parser.tree.TableElements;
 import io.confluent.ksql.parser.tree.TerminateQuery;
 import io.confluent.ksql.parser.tree.UnsetProperty;
 import io.confluent.ksql.parser.tree.WindowExpression;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import io.confluent.ksql.parser.tree.WithinExpression;
 import io.confluent.ksql.query.QueryId;
 import io.confluent.ksql.schema.Operator;
@@ -421,6 +423,7 @@ public class AstBuilder {
           visitIfPresent(context.groupBy(), GroupBy.class),
           partitionBy,
           visitIfPresent(context.having, Expression.class),
+          visitIfPresent(context.withHeaders(), WithHeaders.class),
           resultMaterialization,
           pullQuery,
           limit
@@ -1208,6 +1211,13 @@ public class AstBuilder {
           ParserUtil.getIdentifierText(context.identifier()),
           typeParser.getType(context.type())
       );
+    }
+
+    @Override
+    public Node visitWithHeaders(WithHeadersContext ctx) {
+      final List<Expression> expressions = visit(ctx.valueExpression(), Expression.class);
+
+      return new WithHeaders(getLocation(ctx), expressions);
     }
 
     private void throwOnUnknownNameOrAlias(final SourceName name) {

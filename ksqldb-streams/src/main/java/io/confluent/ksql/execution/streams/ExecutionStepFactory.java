@@ -33,6 +33,7 @@ import io.confluent.ksql.execution.plan.StreamFlatMap;
 import io.confluent.ksql.execution.plan.StreamGroupBy;
 import io.confluent.ksql.execution.plan.StreamGroupByKey;
 import io.confluent.ksql.execution.plan.StreamSelect;
+import io.confluent.ksql.execution.plan.StreamWithHeaders;
 import io.confluent.ksql.execution.plan.StreamSelectKey;
 import io.confluent.ksql.execution.plan.StreamSink;
 import io.confluent.ksql.execution.plan.StreamSource;
@@ -248,6 +249,17 @@ public final class ExecutionStepFactory {
         new ExecutionStepPropertiesV1(stacker.getQueryContext());
 
     return new StreamSelectKey(props, source, fieldName);
+  }
+
+  public static <K> StreamWithHeaders<K> streamSelectHeaders(
+          final QueryContext.Stacker stacker,
+          final ExecutionStep<KStreamHolder<K>> source,
+          final List<Expression> headerExpressions
+  ) {
+    final ExecutionStepPropertiesV1 props =
+            new ExecutionStepPropertiesV1(stacker.getQueryContext());
+
+    return new StreamWithHeaders<>(props, source, headerExpressions);
   }
 
   public static <K> TableSink<K> tableSink(

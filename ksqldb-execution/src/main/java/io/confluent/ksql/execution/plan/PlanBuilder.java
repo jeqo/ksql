@@ -37,6 +37,8 @@ public interface PlanBuilder {
 
   <K> KStreamHolder<K> visitFlatMap(StreamFlatMap<K> streamFlatMap);
 
+  <K> KStreamHolder<K> visitStreamSelectHeaders(StreamWithHeaders<K> streamWithHeaders);
+
   KStreamHolder<Struct> visitStreamSelectKey(StreamSelectKeyV1 streamSelectKey);
 
   KStreamHolder<Struct> visitStreamSelectKey(StreamSelectKey streamSelectKey);

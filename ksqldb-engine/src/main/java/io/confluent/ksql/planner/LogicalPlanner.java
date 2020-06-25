@@ -44,6 +44,7 @@ import io.confluent.ksql.name.SourceName;
 import io.confluent.ksql.parser.NodeLocation;
 import io.confluent.ksql.parser.tree.GroupBy;
 import io.confluent.ksql.parser.tree.PartitionBy;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import io.confluent.ksql.planner.JoinTree.Join;
 import io.confluent.ksql.planner.JoinTree.Leaf;
 import io.confluent.ksql.planner.plan.AggregateNode;
@@ -63,6 +64,7 @@ import io.confluent.ksql.planner.plan.PreJoinRepartitionNode;
 import io.confluent.ksql.planner.plan.ProjectNode;
 import io.confluent.ksql.planner.plan.RepartitionNode;
 import io.confluent.ksql.planner.plan.SelectionUtil;
+import io.confluent.ksql.planner.plan.WithHeadersNode;
 import io.confluent.ksql.planner.plan.UserRepartitionNode;
 import io.confluent.ksql.schema.ksql.Column;
 import io.confluent.ksql.schema.ksql.ColumnNames;
@@ -109,6 +111,10 @@ public class LogicalPlanner {
 
   public OutputNode buildPlan() {
     PlanNode currentNode = buildSourceNode();
+
+    if (analysis.getWithHeaders().isPresent()) {
+      currentNode = buildWithHeadersNode(currentNode, analysis.getWithHeaders().get());
+    }
 
     if (analysis.getWhereExpression().isPresent()) {
       currentNode = buildFilterNode(currentNode, analysis.getWhereExpression().get());
@@ -323,6 +329,13 @@ public class LogicalPlanner {
 
   private FlatMapNode buildFlatMapNode(final PlanNode sourcePlanNode) {
     return new FlatMapNode(new PlanNodeId("FlatMap"), sourcePlanNode, functionRegistry, analysis);
+  }
+
+  private PlanNode buildWithHeadersNode(PlanNode currentNode, WithHeaders withHeaders) {
+    return new WithHeadersNode(
+        new PlanNodeId("WithHeaders"),
+        currentNode,
+        withHeaders.getWithHeaderExpressions());
   }
 
   private PlanNode buildSourceForJoin(

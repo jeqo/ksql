@@ -36,6 +36,7 @@ public class Query extends Statement {
   private final Optional<GroupBy> groupBy;
   private final Optional<PartitionBy> partitionBy;
   private final Optional<Expression> having;
+  private final Optional<WithHeaders> withHeaders;
   private final ResultMaterialization resultMaterialization;
   private final boolean pullQuery;
   private final OptionalInt limit;
@@ -51,6 +52,7 @@ public class Query extends Statement {
       final Optional<GroupBy> groupBy,
       final Optional<PartitionBy> partitionBy,
       final Optional<Expression> having,
+      final Optional<WithHeaders> withHeaders,
       final ResultMaterialization resultMaterialization,
       final boolean pullQuery,
       final OptionalInt limit
@@ -63,6 +65,7 @@ public class Query extends Statement {
     this.groupBy = requireNonNull(groupBy, "groupBy");
     this.partitionBy = requireNonNull(partitionBy, "partitionBy");
     this.having = requireNonNull(having, "having");
+    this.withHeaders = requireNonNull(withHeaders, "withHeaders");
     this.resultMaterialization = requireNonNull(resultMaterialization, "resultMaterialization");
     this.pullQuery = pullQuery;
     this.limit = requireNonNull(limit, "limit");
@@ -100,6 +103,10 @@ public class Query extends Statement {
     return having;
   }
 
+  public Optional<WithHeaders> getWithHeaders() {
+    return withHeaders;
+  }
+
   public ResultMaterialization getResultMaterialization() {
     return resultMaterialization;
   }
@@ -127,6 +134,7 @@ public class Query extends Statement {
         .add("groupBy", groupBy.orElse(null))
         .add("partitionBy", partitionBy.orElse(null))
         .add("having", having.orElse(null))
+        .add("withHeaders", withHeaders.orElse(null))
         .add("resultMaterialization", resultMaterialization)
         .add("pullQuery", pullQuery)
         .add("limit", limit)
@@ -154,6 +162,7 @@ public class Query extends Statement {
         && Objects.equals(groupBy, o.groupBy)
         && Objects.equals(partitionBy, o.partitionBy)
         && Objects.equals(having, o.having)
+        && Objects.equals(withHeaders, o.withHeaders)
         && Objects.equals(resultMaterialization, o.resultMaterialization)
         && Objects.equals(limit, o.limit);
   }
@@ -167,6 +176,7 @@ public class Query extends Statement {
         window,
         groupBy,
         having,
+        withHeaders,
         resultMaterialization,
         pullQuery,
         limit

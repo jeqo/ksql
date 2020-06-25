@@ -77,9 +77,15 @@ query
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
       (PARTITION BY partitionBy=valueExpression)?
+      (WITH HEADERS withHeaders)?
       (HAVING having=booleanExpression)?
       (EMIT resultMaterialization)?
       limitClause?
+    ;
+
+withHeaders
+    : valueExpression (',' valueExpression)*
+    | '(' (valueExpression (',' valueExpression)*)? ')'
     ;
 
 resultMaterialization
@@ -91,7 +97,7 @@ tableElements
     ;
 
 tableElement
-    : identifier type ((PRIMARY)? KEY)? (HEADER)?
+    : identifier type ((PRIMARY)? KEY)?
     ;
 
 tableProperties
@@ -463,7 +469,7 @@ NAMESPACE: 'NAMESPACE';
 MATERIALIZED: 'MATERIALIZED';
 VIEW: 'VIEW';
 PRIMARY: 'PRIMARY';
-HEADER: 'HEADER';
+HEADERS: 'HEADERS';
 
 IF: 'IF';
 

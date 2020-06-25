@@ -29,6 +29,7 @@ import java.util.List;
     @Type(value = StreamGroupBy.class, name = "streamGroupByV1"),
     @Type(value = StreamGroupByKey.class, name = "streamGroupByKeyV1"),
     @Type(value = StreamSelect.class, name = "streamSelectV1"),
+    @Type(value = StreamWithHeaders.class, name = "streamWithHeaders"),
     @Type(value = StreamSelectKeyV1.class, name = "streamSelectKeyV1"),
     @Type(value = StreamSelectKey.class, name = "streamSelectKeyV2"),
     @Type(value = StreamSink.class, name = "streamSinkV1"),

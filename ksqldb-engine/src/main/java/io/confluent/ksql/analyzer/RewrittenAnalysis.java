@@ -31,6 +31,7 @@ import io.confluent.ksql.parser.tree.PartitionBy;
 import io.confluent.ksql.parser.tree.SelectItem;
 import io.confluent.ksql.parser.tree.SingleColumn;
 import io.confluent.ksql.parser.tree.WindowExpression;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -126,6 +127,15 @@ public class RewrittenAnalysis implements ImmutableAnalysis {
             partitionBy.getLocation(),
             rewrite(partitionBy.getExpression())
         ));
+  }
+
+  @Override
+  public Optional<WithHeaders> getWithHeaders() {
+    return original.getWithHeaders()
+            .map(withHeaders -> new WithHeaders(
+                    withHeaders.getLocation(),
+                    rewriteList(withHeaders.getWithHeaderExpressions())
+            ));
   }
 
   @Override

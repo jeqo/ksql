@@ -27,6 +27,7 @@ import io.confluent.ksql.parser.tree.GroupBy;
 import io.confluent.ksql.parser.tree.PartitionBy;
 import io.confluent.ksql.parser.tree.SelectItem;
 import io.confluent.ksql.parser.tree.WindowExpression;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import io.confluent.ksql.testing.EffectivelyImmutable;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +56,8 @@ public interface ImmutableAnalysis {
   Optional<GroupBy> getGroupBy();
 
   Optional<PartitionBy> getPartitionBy();
+
+  Optional<WithHeaders> getWithHeaders();
 
   OptionalInt getLimitClause();
 

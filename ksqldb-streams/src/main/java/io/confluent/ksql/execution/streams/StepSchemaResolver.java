@@ -27,6 +27,7 @@ import io.confluent.ksql.execution.plan.StreamFlatMap;
 import io.confluent.ksql.execution.plan.StreamGroupBy;
 import io.confluent.ksql.execution.plan.StreamGroupByKey;
 import io.confluent.ksql.execution.plan.StreamSelect;
+import io.confluent.ksql.execution.plan.StreamWithHeaders;
 import io.confluent.ksql.execution.plan.StreamSelectKey;
 import io.confluent.ksql.execution.plan.StreamSelectKeyV1;
 import io.confluent.ksql.execution.plan.StreamSink;
@@ -86,6 +87,7 @@ public final class StepSchemaResolver {
       .put(TableSink.class, StepSchemaResolver::sameSchema)
       .put(TableSource.class, StepSchemaResolver::handleSource)
       .put(WindowedTableSource.class, StepSchemaResolver::handleWindowedSource)
+      .put(StreamWithHeaders.class, StepSchemaResolver::sameSchema)
       .build();
 
   @SuppressWarnings("rawtypes")

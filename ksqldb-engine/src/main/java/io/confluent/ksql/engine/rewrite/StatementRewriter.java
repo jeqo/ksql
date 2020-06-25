@@ -47,6 +47,7 @@ import io.confluent.ksql.parser.tree.Table;
 import io.confluent.ksql.parser.tree.TableElement;
 import io.confluent.ksql.parser.tree.TableElements;
 import io.confluent.ksql.parser.tree.WindowExpression;
+import io.confluent.ksql.parser.tree.WithHeaders;
 import io.confluent.ksql.parser.tree.WithinExpression;
 import java.util.List;
 import java.util.Objects;
@@ -195,6 +196,9 @@ public final class StatementRewriter<C> {
       final Optional<Expression> having = node.getHaving()
           .map(exp -> (processExpression(exp, context)));
 
+      final Optional<WithHeaders> withHeaders = node.getWithHeaders()
+          .map(exp -> ((WithHeaders) rewriter.apply(exp, context)));
+
       return new Query(
           node.getLocation(),
           select,
@@ -204,6 +208,7 @@ public final class StatementRewriter<C> {
           groupBy,
           partitionBy,
           having,
+          withHeaders,
           node.getResultMaterialization(),
           node.isPullQuery(),
           node.getLimit()
