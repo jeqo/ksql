@@ -19,7 +19,6 @@ import io.confluent.ksql.GenericRow;
 import io.confluent.ksql.execution.streams.materialization.MaterializationException;
 import io.confluent.ksql.execution.streams.materialization.MaterializedTable;
 import io.confluent.ksql.execution.streams.materialization.Row;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.kafka.connect.data.Struct;
