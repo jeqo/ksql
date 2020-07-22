@@ -342,6 +342,7 @@ literal
     | number                                                                         #numericLiteral
     | booleanValue                                                                   #booleanLiteral
     | STRING                                                                         #stringLiteral
+    | BYTES                                                                          #bytesLiteral
     ;
 
 nonReserved
@@ -514,6 +515,10 @@ STRING
     : '\'' ( ~'\'' | '\'\'' )* '\''
     ;
 
+BYTES
+    : '[' (HEX_LETTER | DIGIT)* ']'
+    ;
+
 INTEGER_VALUE
     : DIGIT+
     ;
@@ -562,6 +567,10 @@ fragment DIGIT
 
 fragment LETTER
     : [A-Z]
+    ;
+
+fragment HEX_LETTER
+    : [A-F]
     ;
 
 SIMPLE_COMMENT
