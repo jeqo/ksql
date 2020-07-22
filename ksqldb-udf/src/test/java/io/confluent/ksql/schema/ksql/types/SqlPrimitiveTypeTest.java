@@ -48,6 +48,8 @@ public class SqlPrimitiveTypeTest {
             SqlPrimitiveType.of(SqlBaseType.DOUBLE))
         .addEqualityGroup(SqlPrimitiveType.of(SqlBaseType.STRING),
             SqlPrimitiveType.of(SqlBaseType.STRING))
+        .addEqualityGroup(SqlPrimitiveType.of(SqlBaseType.BYTES),
+            SqlPrimitiveType.of(SqlBaseType.BYTES))
         .addEqualityGroup(SqlArray.of(SqlPrimitiveType.of(SqlBaseType.STRING)))
         .testEquals();
   }
@@ -108,13 +110,15 @@ public class SqlPrimitiveTypeTest {
   @Test
   public void shouldSupportSqlPrimitiveTypes() {
     // Given:
-    final java.util.Map<String, SqlBaseType> primitives = ImmutableMap.of(
-        "BooleaN", SqlBaseType.BOOLEAN,
-        "IntegeR", SqlBaseType.INTEGER,
-        "BigInT", SqlBaseType.BIGINT,
-        "DoublE", SqlBaseType.DOUBLE,
-        "StrinG", SqlBaseType.STRING
-    );
+    final java.util.Map<String, SqlBaseType> primitives =
+        ImmutableMap.<String, SqlBaseType>builder()
+            .put("BooleaN", SqlBaseType.BOOLEAN)
+            .put("IntegeR", SqlBaseType.INTEGER)
+            .put("BigInT", SqlBaseType.BIGINT)
+            .put("DoublE", SqlBaseType.DOUBLE)
+            .put("StrinG", SqlBaseType.STRING)
+            .put("ByteS", SqlBaseType.BYTES)
+            .build();
 
     primitives.forEach((string, expected) ->
         // Then:
@@ -139,14 +143,15 @@ public class SqlPrimitiveTypeTest {
   @Test
   public void shouldSupportAllPrimitiveTypeNames() {
     // Given:
-    final Set<String> typeNames = ImmutableSet.of(
-        "INT",
-        "VARCHAR",
-        "BOOLEAN",
-        "BIGINT",
-        "DOUBLE",
-        "STRING"
-    );
+    final Set<String> typeNames = ImmutableSet.<String>builder()
+        .add("INT")
+        .add("VARCHAR")
+        .add("BOOLEAN")
+        .add("BIGINT")
+        .add("DOUBLE")
+        .add("STRING")
+        .add("BYTES")
+        .build();
 
     // When:
     final List<Boolean> missing = typeNames.stream()
@@ -174,7 +179,8 @@ public class SqlPrimitiveTypeTest {
         SqlBaseType.INTEGER,
         SqlBaseType.BIGINT,
         SqlBaseType.DOUBLE,
-        SqlBaseType.STRING
+        SqlBaseType.STRING,
+        SqlBaseType.BYTES
     ).forEach(type -> {
       // Then:
       assertThat(SqlPrimitiveType.of(type).toString(), is(type.toString()));
@@ -188,6 +194,7 @@ public class SqlPrimitiveTypeTest {
     SqlPrimitiveType.of(SqlBaseType.BIGINT).validateValue(33L);
     SqlPrimitiveType.of(SqlBaseType.DOUBLE).validateValue(45.0D);
     SqlPrimitiveType.of(SqlBaseType.STRING).validateValue("");
+    SqlPrimitiveType.of(SqlBaseType.BYTES).validateValue(new byte[]{});
   }
 
   @SuppressWarnings("UnnecessaryBoxing")

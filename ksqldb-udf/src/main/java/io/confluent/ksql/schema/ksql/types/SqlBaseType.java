@@ -19,7 +19,7 @@ package io.confluent.ksql.schema.ksql.types;
  * The SQL types supported by KSQL.
  */
 public enum SqlBaseType {
-  BOOLEAN, INTEGER, BIGINT, DECIMAL, DOUBLE, STRING, ARRAY, MAP, STRUCT;
+  BOOLEAN, INTEGER, BIGINT, DECIMAL, DOUBLE, STRING, ARRAY, MAP, STRUCT, BYTES;
 
   /**
    * @return {@code true} if numeric type.

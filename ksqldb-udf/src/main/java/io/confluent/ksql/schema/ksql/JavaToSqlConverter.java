@@ -41,6 +41,7 @@ class JavaToSqlConverter implements JavaToSqlTypeConverter {
       .put(List.class, SqlBaseType.ARRAY)
       .put(Map.class, SqlBaseType.MAP)
       .put(KsqlStruct.class, SqlBaseType.STRUCT)
+      .put(byte[].class, SqlBaseType.BYTES)
       .build();
 
   @Override
