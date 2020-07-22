@@ -68,6 +68,7 @@ import io.confluent.ksql.parser.SqlBaseParser.AssertStreamContext;
 import io.confluent.ksql.parser.SqlBaseParser.AssertTableContext;
 import io.confluent.ksql.parser.SqlBaseParser.AssertTombstoneContext;
 import io.confluent.ksql.parser.SqlBaseParser.AssertValuesContext;
+import io.confluent.ksql.parser.SqlBaseParser.BytesLiteralContext;
 import io.confluent.ksql.parser.SqlBaseParser.CreateConnectorContext;
 import io.confluent.ksql.parser.SqlBaseParser.DescribeConnectorContext;
 import io.confluent.ksql.parser.SqlBaseParser.DropConnectorContext;
@@ -1149,6 +1150,11 @@ public class AstBuilder {
           getLocation(context),
           ParserUtil.unquote(context.STRING().getText(), "'")
       );
+    }
+
+    @Override
+    public Node visitBytesLiteral(final BytesLiteralContext context) {
+      return ParserUtil.parseBytesLiteral(context);
     }
 
     @Override

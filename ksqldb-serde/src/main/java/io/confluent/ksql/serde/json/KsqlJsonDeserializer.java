@@ -74,7 +74,7 @@ public class KsqlJsonDeserializer implements Deserializer<Object> {
       .put(Type.ARRAY, KsqlJsonDeserializer::enforceElementTypeForArray)
       .put(Type.MAP, KsqlJsonDeserializer::enforceKeyAndValueTypeForMap)
       .put(Type.STRUCT, KsqlJsonDeserializer::enforceFieldTypesForStruct)
-      .put(Type.BYTES, KsqlJsonDeserializer::enforceValidBytes)
+      .put(Type.BYTES, context -> JsonSerdeUtils.toBytes(context.val))
       .build();
 
   private final PersistenceSchema physicalSchema;
@@ -168,20 +168,20 @@ public class KsqlJsonDeserializer implements Deserializer<Object> {
     return context.val.asText();
   }
 
-  private static Object enforceValidBytes(final JsonValueContext context) {
-    final BigDecimal decimal;
-    final boolean isDecimal = DecimalUtil.isDecimal(context.schema);
-    if (isDecimal && context.val instanceof NumericNode) {
-      decimal = context.val.decimalValue();
-      DecimalUtil.ensureFit(decimal, context.schema);
-      return decimal;
-    } else if (isDecimal && context.val instanceof TextNode) {
-      decimal = new BigDecimal(context.val.textValue());
-      DecimalUtil.ensureFit(decimal, context.schema);
-      return decimal;
-    }
-    throw invalidConversionException(context.val, context.schema);
-  }
+//  private static Object enforceValidBytes(final JsonValueContext context) {
+//    final BigDecimal decimal;
+//    final boolean isDecimal = DecimalUtil.isDecimal(context.schema);
+//    if (isDecimal && context.val instanceof NumericNode) {
+//      decimal = context.val.decimalValue();
+//      DecimalUtil.ensureFit(decimal, context.schema);
+//      return decimal;
+//    } else if (isDecimal && context.val instanceof TextNode) {
+//      decimal = new BigDecimal(context.val.textValue());
+//      DecimalUtil.ensureFit(decimal, context.schema);
+//      return decimal;
+//    }
+//    throw invalidConversionException(context.val, context.schema);
+//  }
 
   private static List<?> enforceElementTypeForArray(final JsonValueContext context) {
     if (!(context.val instanceof ArrayNode)) {

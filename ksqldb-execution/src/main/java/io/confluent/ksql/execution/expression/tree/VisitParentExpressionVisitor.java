@@ -62,6 +62,11 @@ public abstract class VisitParentExpressionVisitor<R, C> implements ExpressionVi
   }
 
   @Override
+  public R visitBytesLiteral(final BytesLiteral node, final C context) {
+    return visitLiteral(node, context);
+  }
+
+  @Override
   public R visitDoubleLiteral(final DoubleLiteral node, final C context) {
     return visitLiteral(node, context);
   }

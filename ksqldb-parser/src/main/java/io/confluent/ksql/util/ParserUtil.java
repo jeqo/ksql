@@ -18,6 +18,7 @@ package io.confluent.ksql.util;
 import static io.confluent.ksql.parser.SqlBaseParser.DecimalLiteralContext;
 import static java.util.Objects.requireNonNull;
 
+import io.confluent.ksql.execution.expression.tree.BytesLiteral;
 import io.confluent.ksql.execution.expression.tree.DecimalLiteral;
 import io.confluent.ksql.execution.expression.tree.DoubleLiteral;
 import io.confluent.ksql.execution.expression.tree.IntegerLiteral;
@@ -27,6 +28,7 @@ import io.confluent.ksql.name.SourceName;
 import io.confluent.ksql.parser.NodeLocation;
 import io.confluent.ksql.parser.ParsingException;
 import io.confluent.ksql.parser.SqlBaseParser;
+import io.confluent.ksql.parser.SqlBaseParser.BytesLiteralContext;
 import io.confluent.ksql.parser.SqlBaseParser.FloatLiteralContext;
 import io.confluent.ksql.parser.SqlBaseParser.IntegerLiteralContext;
 import io.confluent.ksql.parser.SqlBaseParser.NumberContext;
@@ -174,6 +176,27 @@ public final class ParserUtil {
       return new DecimalLiteral(location, new BigDecimal(value));
     } catch (final NumberFormatException e) {
       throw new ParsingException("Invalid numeric literal: " + context.getText(), location);
+    }
+  }
+
+  private static String validateAndExtractBytes(final String value) {
+    if (value.charAt(0) != '[') {
+      throw new IllegalStateException("Value must begin with a square bracket opening");
+    }
+    if (value.charAt(value.length() - 1) != ']' || value.length() < 2) {
+      throw new IllegalArgumentException("Expected matching closing square bracket at end of value");
+    }
+
+    return value.substring(1, value.length() - 1);
+  }
+
+  public static BytesLiteral parseBytesLiteral(final BytesLiteralContext context) {
+    final Optional<NodeLocation> location = getLocation(context);
+
+    try {
+      return new BytesLiteral(location, validateAndExtractBytes(context.BYTES().getText()));
+    } catch (final NumberFormatException e) {
+      throw new ParsingException("Invalid bytes literal: " + context.getText(), location);
     }
   }
 

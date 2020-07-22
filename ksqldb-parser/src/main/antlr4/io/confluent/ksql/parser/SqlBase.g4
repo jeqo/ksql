@@ -516,7 +516,11 @@ STRING
     ;
 
 BYTES
-    : '[' (HEX_LETTER | DIGIT)* ']'
+    : '[' (FOUR_BITS)* ']'
+    ;
+
+FOUR_BITS
+    : HEX_LETTER | DIGIT
     ;
 
 INTEGER_VALUE

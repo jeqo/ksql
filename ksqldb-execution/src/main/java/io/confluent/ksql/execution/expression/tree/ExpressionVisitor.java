@@ -71,6 +71,8 @@ public interface ExpressionVisitor<R, C> {
 
   R visitStringLiteral(StringLiteral exp, C context);
 
+  R visitBytesLiteral(BytesLiteral exp, C context);
+
   R visitSubscriptExpression(SubscriptExpression exp, C context);
 
   R visitCreateArrayExpression(CreateArrayExpression exp, C context);

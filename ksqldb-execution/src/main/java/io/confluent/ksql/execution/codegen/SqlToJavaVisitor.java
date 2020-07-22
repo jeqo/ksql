@@ -26,6 +26,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import io.confluent.ksql.execution.codegen.helpers.ArrayAccess;
 import io.confluent.ksql.execution.codegen.helpers.ArrayBuilder;
+import io.confluent.ksql.execution.codegen.helpers.BytesBuilder;
 import io.confluent.ksql.execution.codegen.helpers.LikeEvaluator;
 import io.confluent.ksql.execution.codegen.helpers.MapBuilder;
 import io.confluent.ksql.execution.codegen.helpers.SearchedCaseFunction;
@@ -33,6 +34,7 @@ import io.confluent.ksql.execution.expression.tree.ArithmeticBinaryExpression;
 import io.confluent.ksql.execution.expression.tree.ArithmeticUnaryExpression;
 import io.confluent.ksql.execution.expression.tree.BetweenPredicate;
 import io.confluent.ksql.execution.expression.tree.BooleanLiteral;
+import io.confluent.ksql.execution.expression.tree.BytesLiteral;
 import io.confluent.ksql.execution.expression.tree.Cast;
 import io.confluent.ksql.execution.expression.tree.ComparisonExpression;
 import io.confluent.ksql.execution.expression.tree.CreateArrayExpression;
@@ -129,6 +131,7 @@ public class SqlToJavaVisitor {
       SchemaBuilder.class.getCanonicalName(),
       Struct.class.getCanonicalName(),
       ArrayBuilder.class.getCanonicalName(),
+      BytesBuilder.class.getCanonicalName(),
       LikeEvaluator.class.getCanonicalName(),
       MapBuilder.class.getCanonicalName()
   );
@@ -292,6 +295,15 @@ public class SqlToJavaVisitor {
       return new Pair<>(
           "\"" + StringEscapeUtils.escapeJava(node.getValue()) + "\"",
           SqlTypes.STRING
+      );
+    }
+
+    @Override
+    public Pair<String, SqlType> visitBytesLiteral(BytesLiteral node, Void context) {
+      final String code = "new BytesBuilder(\"" + node.getValue() + "\").build()";
+      return new Pair<>(
+          code,
+          SqlTypes.BYTES
       );
     }
 

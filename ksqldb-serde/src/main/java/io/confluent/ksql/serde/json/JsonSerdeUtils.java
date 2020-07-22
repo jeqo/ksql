@@ -17,6 +17,7 @@ package io.confluent.ksql.serde.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BinaryNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -153,6 +154,23 @@ public final class JsonSerdeUtils {
     }
 
     throw invalidConversionException(object, SqlBaseType.DOUBLE);
+  }
+
+  static byte[] toBytes(final JsonNode object) {
+    try {
+      if (object instanceof BinaryNode) {
+        return object.binaryValue();
+    }
+    if (object instanceof TextNode) {
+      try {
+        return object.binaryValue();
+      } catch (final NumberFormatException e) {
+        throw failedStringCoercionException(SqlBaseType.BYTES);
+      }
+    }
+    } catch (IOException e) {
+    }
+    throw invalidConversionException(object, SqlBaseType.BYTES);
   }
 
   static IllegalArgumentException invalidConversionException(
