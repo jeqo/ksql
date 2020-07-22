@@ -15,15 +15,11 @@
 
 package io.confluent.ksql.serde.connect;
 
-import io.confluent.ksql.util.DecimalUtil;
-import io.confluent.ksql.util.KsqlPreconditions;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Field;
@@ -93,18 +89,6 @@ public class ConnectDataTranslator implements DataTranslator {
   private static void validateType(
       final String pathStr,
       final Schema schema,
-      final Schema connectSchema,
-      final Predicate<Schema> requirement
-  ) {
-    if (requirement.test(connectSchema)) {
-      return;
-    }
-    throwTypeMismatchException(pathStr, schema, connectSchema);
-  }
-
-  private static void validateType(
-      final String pathStr,
-      final Schema schema,
       final Schema connectSchema
   ) {
     if (!connectSchema.type().equals(schema.type())) {
@@ -153,6 +137,7 @@ public class ConnectDataTranslator implements DataTranslator {
       case ARRAY:
       case MAP:
       case STRUCT:
+      case BYTES:
         validateType(pathStr, schema, connectSchema);
         break;
       case STRING:
@@ -166,9 +151,6 @@ public class ConnectDataTranslator implements DataTranslator {
         break;
       case FLOAT64:
         validateType(pathStr, schema, connectSchema, FLOAT64_ACCEPTABLE_TYPES);
-        break;
-      case BYTES:
-        validateType(pathStr, schema, connectSchema, s -> Decimal.LOGICAL_NAME.equals(s.name()));
         break;
       default:
         throw new RuntimeException(
@@ -225,7 +207,7 @@ public class ConnectDataTranslator implements DataTranslator {
       case FLOAT64:
         return ((Number) convertedValue).doubleValue();
       case BYTES:
-        return toKsqlBytes(convertedValue, connectSchema);
+        return connectValue; //pass bytes array
       case ARRAY:
         return toKsqlArray(
             schema.valueSchema(), connectSchema.valueSchema(), (List) convertedValue, pathStr);
@@ -243,16 +225,17 @@ public class ConnectDataTranslator implements DataTranslator {
     }
   }
 
-  private Object toKsqlBytes(
-      final Object convertedValue,
-      final Schema schema
-  ) {
-    KsqlPreconditions.checkArgument(DecimalUtil.isDecimal(schema), "BYTES type must be DECIMAL");
-    KsqlPreconditions.checkArgument(convertedValue instanceof BigDecimal,
-        "must serialize decimal type as BigDecimal. Got: " + convertedValue.getClass());
-
-    return convertedValue;
-  }
+  //FIXME to be removed as it should support all bytes
+//  private Object toKsqlBytes(
+//      final Object convertedValue,
+//      final Schema schema
+//  ) {
+//    KsqlPreconditions.checkArgument(DecimalUtil.isDecimal(schema), "BYTES type must be DECIMAL");
+//    KsqlPreconditions.checkArgument(convertedValue instanceof BigDecimal,
+//        "must serialize decimal type as BigDecimal. Got: " + convertedValue.getClass());
+//
+//    return convertedValue;
+//  }
 
   private List<?> toKsqlArray(
       final Schema valueSchema,
