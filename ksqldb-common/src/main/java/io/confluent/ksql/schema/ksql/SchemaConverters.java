@@ -206,7 +206,7 @@ public final class SchemaConverters {
         .put(Schema.Type.ARRAY, ConnectToSqlConverter::toSqlArray)
         .put(Schema.Type.MAP, ConnectToSqlConverter::toSqlMap)
         .put(Schema.Type.STRUCT, ConnectToSqlConverter::toSqlStruct)
-        .put(Schema.Type.BYTES, ConnectToSqlConverter::handleBytes)
+        .put(Schema.Type.BYTES, s -> SqlTypes.BYTES)
         .build();
 
     @Override
@@ -223,10 +223,11 @@ public final class SchemaConverters {
       return handler.apply(schema);
     }
 
-    private static SqlDecimal handleBytes(final Schema schema) {
-      DecimalUtil.requireDecimal(schema);
-      return SqlDecimal.of(DecimalUtil.precision(schema), DecimalUtil.scale(schema));
-    }
+    //FIXME not needed as supporting all bytes
+//    private static SqlDecimal handleBytes(final Schema schema) {
+//      DecimalUtil.requireDecimal(schema);
+//      return SqlDecimal.of(DecimalUtil.precision(schema), DecimalUtil.scale(schema));
+//    }
 
     private static SqlArray toSqlArray(final Schema schema) {
       return SqlArray.of(sqlType(schema.valueSchema()));
@@ -254,6 +255,7 @@ public final class SchemaConverters {
     private static final Map<SqlBaseType, Function<SqlType, SchemaBuilder>> SQL_TO_CONNECT =
         ImmutableMap.<SqlBaseType, Function<SqlType, SchemaBuilder>>builder()
             .put(SqlBaseType.STRING, t -> SchemaBuilder.string().optional())
+            .put(SqlBaseType.BYTES, t -> SchemaBuilder.bytes().optional())
             .put(SqlBaseType.BOOLEAN, t -> SchemaBuilder.bool().optional())
             .put(SqlBaseType.INTEGER, t -> SchemaBuilder.int32().optional())
             .put(SqlBaseType.BIGINT, t -> SchemaBuilder.int64().optional())
@@ -323,6 +325,7 @@ public final class SchemaConverters {
         .put(List.class, SqlBaseType.ARRAY)
         .put(Map.class, SqlBaseType.MAP)
         .put(Struct.class, SqlBaseType.STRUCT)
+        .put(byte[].class, SqlBaseType.BYTES)
         .build();
 
     @Override
@@ -356,6 +359,7 @@ public final class SchemaConverters {
     private static final BiMap<ParamType, SqlType> FUNCTION_TO_SQL =
         ImmutableBiMap.<ParamType, SqlType>builder()
             .put(ParamTypes.STRING, SqlTypes.STRING)
+            .put(ParamTypes.BYTES, SqlTypes.BYTES)
             .put(ParamTypes.BOOLEAN, SqlTypes.BOOLEAN)
             .put(ParamTypes.INTEGER, SqlTypes.INTEGER)
             .put(ParamTypes.LONG, SqlTypes.BIGINT)
@@ -398,6 +402,7 @@ public final class SchemaConverters {
             .put(ParamTypes.LONG, SqlBaseType.BIGINT)
             .put(ParamTypes.DOUBLE, SqlBaseType.DOUBLE)
             .put(ParamTypes.DECIMAL, SqlBaseType.DECIMAL)
+            .put(ParamTypes.BYTES, SqlBaseType.BYTES)
             .build();
 
     @Override
