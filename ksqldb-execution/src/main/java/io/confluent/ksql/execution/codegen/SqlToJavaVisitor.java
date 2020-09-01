@@ -299,7 +299,7 @@ public class SqlToJavaVisitor {
     }
 
     @Override
-    public Pair<String, SqlType> visitBytesLiteral(BytesLiteral node, Void context) {
+    public Pair<String, SqlType> visitBytesLiteral(final BytesLiteral node, final Void context) {
       final String code = "new BytesBuilder(\"" + node.getValue() + "\").build()";
       return new Pair<>(
           code,

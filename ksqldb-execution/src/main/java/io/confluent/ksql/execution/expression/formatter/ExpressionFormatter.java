@@ -412,7 +412,7 @@ public final class ExpressionFormatter {
     }
 
 
-    private static String formatBytesLiteral(String bytes) {
+    private static String formatBytesLiteral(final String bytes) {
       return "[" + bytes + "]";
     }
   }

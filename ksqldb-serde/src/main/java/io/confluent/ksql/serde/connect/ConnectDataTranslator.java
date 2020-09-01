@@ -225,18 +225,6 @@ public class ConnectDataTranslator implements DataTranslator {
     }
   }
 
-  //FIXME to be removed as it should support all bytes
-//  private Object toKsqlBytes(
-//      final Object convertedValue,
-//      final Schema schema
-//  ) {
-//    KsqlPreconditions.checkArgument(DecimalUtil.isDecimal(schema), "BYTES type must be DECIMAL");
-//    KsqlPreconditions.checkArgument(convertedValue instanceof BigDecimal,
-//        "must serialize decimal type as BigDecimal. Got: " + convertedValue.getClass());
-//
-//    return convertedValue;
-//  }
-
   private List<?> toKsqlArray(
       final Schema valueSchema,
       final Schema connectValueSchema,

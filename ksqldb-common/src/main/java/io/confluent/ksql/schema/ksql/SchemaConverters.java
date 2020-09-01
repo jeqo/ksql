@@ -223,12 +223,6 @@ public final class SchemaConverters {
       return handler.apply(schema);
     }
 
-    //FIXME not needed as supporting all bytes
-//    private static SqlDecimal handleBytes(final Schema schema) {
-//      DecimalUtil.requireDecimal(schema);
-//      return SqlDecimal.of(DecimalUtil.precision(schema), DecimalUtil.scale(schema));
-//    }
-
     private static SqlArray toSqlArray(final Schema schema) {
       return SqlArray.of(sqlType(schema.valueSchema()));
     }

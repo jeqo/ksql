@@ -15,7 +15,7 @@
 
 package io.confluent.ksql.function.types;
 
-public class BytesType extends ObjectType {
+public final class BytesType extends ObjectType {
 
   public static final BytesType INSTANCE = new BytesType();
 
@@ -29,7 +29,7 @@ public class BytesType extends ObjectType {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof  BytesType;
+    return obj instanceof BytesType;
   }
 
   @Override

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 Confluent Inc.
+ *
+ * Licensed under the Confluent Community License (the "License"); you may not use
+ * this file except in compliance with the License.  You may obtain a copy of the
+ * License at
+ *
+ * http://www.confluent.io/confluent-community-license
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
 package io.confluent.ksql.execution.codegen.helpers;
 
 public class BytesBuilder {
@@ -6,13 +21,13 @@ public class BytesBuilder {
 
   private final String hex;
 
-  public BytesBuilder(String hex) {
+  public BytesBuilder(final String hex) {
     this.hex = hex;
   }
 
   public byte[] build() {
-    int len = hex.length();
-    byte[] data = new byte[len / 2];
+    final int len = hex.length();
+    final byte[] data = new byte[len / 2];
     for (int i = 0; i < len; i += 2) {
       data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
           + Character.digit(hex.charAt(i + 1), 16));

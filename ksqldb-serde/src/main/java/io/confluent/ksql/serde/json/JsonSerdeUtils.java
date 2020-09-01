@@ -160,15 +160,16 @@ public final class JsonSerdeUtils {
     try {
       if (object instanceof BinaryNode) {
         return object.binaryValue();
-    }
-    if (object instanceof TextNode) {
-      try {
-        return object.binaryValue();
-      } catch (final NumberFormatException e) {
-        throw failedStringCoercionException(SqlBaseType.BYTES);
       }
-    }
-    } catch (IOException e) {
+      if (object instanceof TextNode) {
+        try {
+          return object.binaryValue();
+        } catch (final NumberFormatException e) {
+          throw failedStringCoercionException(SqlBaseType.BYTES);
+        }
+      }
+    } catch (IOException ignored) {
+      throw invalidConversionException(object, SqlBaseType.BYTES);
     }
     throw invalidConversionException(object, SqlBaseType.BYTES);
   }

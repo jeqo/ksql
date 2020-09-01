@@ -96,14 +96,6 @@ public class ConnectSchemaTranslator {
     }
   }
 
-  //FIXME remove as any bytes should be supported
-//  private static Schema toKsqlBytesSchema(final Schema schema) {
-//    if (DecimalUtil.isDecimal(schema)) {
-//      return schema;
-//    }
-//    throw new UnsupportedTypeException("BYTES type must be DECIMAL schema.");
-//  }
-
   private static Schema toKsqlMapSchema(final Schema schema) {
     final Schema keySchema = toKsqlFieldSchema(schema.keySchema());
     checkMapKeyType(keySchema.type());

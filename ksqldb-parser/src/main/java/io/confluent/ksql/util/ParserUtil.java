@@ -44,7 +44,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+// CHECKSTYLE_RULES.OFF: ClassDataAbstractionCoupling
 public final class ParserUtil {
+  // CHECKSTYLE_RULES.ON: ClassDataAbstractionCoupling
 
   /**
    * Source names must adhere to the kafka topic naming convention. We restrict
@@ -184,7 +186,8 @@ public final class ParserUtil {
       throw new IllegalStateException("Value must begin with a square bracket opening");
     }
     if (value.charAt(value.length() - 1) != ']' || value.length() < 2) {
-      throw new IllegalArgumentException("Expected matching closing square bracket at end of value");
+      throw new IllegalArgumentException("Expected matching closing square bracket at "
+          + "end of value");
     }
 
     return value.substring(1, value.length() - 1);
