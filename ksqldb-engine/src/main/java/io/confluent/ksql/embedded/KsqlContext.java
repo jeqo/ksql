@@ -181,6 +181,14 @@ public class KsqlContext implements AutoCloseable {
     ksqlEngine.getPersistentQuery(queryId).ifPresent(QueryMetadata::close);
   }
 
+  public void startQuery(final QueryId queryId) {
+    ksqlEngine.getPersistentQuery(queryId).ifPresent(QueryMetadata::start);
+  }
+
+  public void stopQuery(final QueryId queryId) {
+    ksqlEngine.getPersistentQuery(queryId).ifPresent(QueryMetadata::stop);
+  }
+
   private static ExecuteResult execute(
       final KsqlExecutionContext executionContext,
       final ParsedStatement stmt,

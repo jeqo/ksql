@@ -142,8 +142,10 @@ import io.confluent.ksql.parser.tree.SelectItem;
 import io.confluent.ksql.parser.tree.SetProperty;
 import io.confluent.ksql.parser.tree.ShowColumns;
 import io.confluent.ksql.parser.tree.SingleColumn;
+import io.confluent.ksql.parser.tree.StartQuery;
 import io.confluent.ksql.parser.tree.Statement;
 import io.confluent.ksql.parser.tree.Statements;
+import io.confluent.ksql.parser.tree.StopQuery;
 import io.confluent.ksql.parser.tree.Table;
 import io.confluent.ksql.parser.tree.TableElement;
 import io.confluent.ksql.parser.tree.TableElement.Namespace;
@@ -705,6 +707,30 @@ public class AstBuilder {
     @Override
     public Node visitListTypes(final ListTypesContext ctx) {
       return new ListTypes(getLocation(ctx));
+    }
+
+    @Override
+    public Node visitStartQuery(final SqlBaseParser.StartQueryContext context) {
+      final Optional<NodeLocation> location = getLocation(context);
+
+      return context.ALL() != null
+          ? StartQuery.all(location)
+          : StartQuery.query(
+              location,
+              new QueryId(ParserUtil.getIdentifierText(false, context.identifier()))
+          );
+    }
+
+    @Override
+    public Node visitStopQuery(final SqlBaseParser.StopQueryContext context) {
+      final Optional<NodeLocation> location = getLocation(context);
+
+      return context.ALL() != null
+          ? StopQuery.all(location)
+          : StopQuery.query(
+              location,
+              new QueryId(ParserUtil.getIdentifierText(false, context.identifier()))
+          );
     }
 
     @Override

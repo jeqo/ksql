@@ -61,6 +61,10 @@ statement
     | (LIST | SHOW) QUERIES EXTENDED?                                       #listQueries
     | TERMINATE identifier                                                  #terminateQuery
     | TERMINATE ALL                                                         #terminateQuery
+    | START identifier                                                      #startQuery
+    | START ALL                                                             #startQuery
+    | STOP identifier                                                              #stopQuery
+    | STOP ALL                                                              #stopQuery
     | SET STRING EQ STRING                                                  #setProperty
     | UNSET STRING                                                          #unsetProperty
     | DEFINE variableName EQ variableValue                                  #defineVariable
@@ -482,6 +486,8 @@ TOPICS: 'TOPICS';
 QUERY: 'QUERY';
 QUERIES: 'QUERIES';
 TERMINATE: 'TERMINATE';
+START: 'START';
+STOP: 'STOP';
 LOAD: 'LOAD';
 COLUMNS: 'COLUMNS';
 COLUMN: 'COLUMN';

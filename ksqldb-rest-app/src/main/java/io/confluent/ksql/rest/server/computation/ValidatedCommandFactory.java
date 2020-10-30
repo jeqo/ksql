@@ -19,7 +19,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.confluent.ksql.KsqlExecutionContext;
 import io.confluent.ksql.engine.KsqlPlan;
 import io.confluent.ksql.execution.json.PlanJsonMapper;
+import io.confluent.ksql.parser.tree.StartQuery;
 import io.confluent.ksql.parser.tree.Statement;
+import io.confluent.ksql.parser.tree.StopQuery;
 import io.confluent.ksql.parser.tree.TerminateQuery;
 import io.confluent.ksql.planner.plan.ConfiguredKsqlPlan;
 import io.confluent.ksql.query.QueryId;
@@ -99,30 +101,60 @@ public final class ValidatedCommandFactory {
       return Command.of(statement);
     }
 
-    if (statement.getStatement() instanceof TerminateQuery) {
-      return createForTerminateQuery(statement, context);
+    if (statement.getStatement() instanceof TerminateQuery ||
+        statement.getStatement() instanceof StartQuery ||
+        statement.getStatement() instanceof StopQuery) {
+      return createForControlQuery(statement, context);
     }
 
     return createForPlannedQuery(statement, serviceContext, context);
   }
 
-  private static Command createForTerminateQuery(
+  private static Command createForControlQuery(
       final ConfiguredStatement<? extends Statement> statement,
       final KsqlExecutionContext context
   ) {
-    final TerminateQuery terminateQuery = (TerminateQuery) statement.getStatement();
-    final Optional<QueryId> queryId = terminateQuery.getQueryId();
+    if (statement.getStatement() instanceof TerminateQuery) {
+      final TerminateQuery terminateQuery = (TerminateQuery) statement.getStatement();
+      final Optional<QueryId> queryId = terminateQuery.getQueryId();
+      if (!queryId.isPresent()) {
+        context.getPersistentQueries().forEach(PersistentQueryMetadata::close);
+        return Command.of(statement);
+      }
 
-    if (!queryId.isPresent()) {
-      context.getPersistentQueries().forEach(PersistentQueryMetadata::close);
-      return Command.of(statement);
+      context.getPersistentQuery(queryId.get())
+          .orElseThrow(() -> new KsqlStatementException(
+              "Unknown queryId: " + queryId.get(),
+              statement.getStatementText()))
+          .close();
+    } else if (statement.getStatement() instanceof StartQuery) {
+      final StartQuery startQuery = (StartQuery) statement.getStatement();
+      final Optional<QueryId> queryId = startQuery.getQueryId();
+      if (!queryId.isPresent()) {
+        context.getPersistentQueries().forEach(PersistentQueryMetadata::close);
+        return Command.of(statement);
+      }
+
+      context.getPersistentQuery(queryId.get())
+          .orElseThrow(() -> new KsqlStatementException(
+              "Unknown queryId: " + queryId.get(),
+              statement.getStatementText()))
+          .start();
+    } else if (statement.getStatement() instanceof StopQuery) {
+      final StopQuery stopQuery = (StopQuery) statement.getStatement();
+      final Optional<QueryId> queryId = stopQuery.getQueryId();
+      if (!queryId.isPresent()) {
+        context.getPersistentQueries().forEach(PersistentQueryMetadata::close);
+        return Command.of(statement);
+      }
+
+      context.getPersistentQuery(queryId.get())
+          .orElseThrow(() -> new KsqlStatementException(
+              "Unknown queryId: " + queryId.get(),
+              statement.getStatementText()))
+          .stop();
     }
 
-    context.getPersistentQuery(queryId.get())
-        .orElseThrow(() -> new KsqlStatementException(
-            "Unknown queryId: " + queryId.get(),
-            statement.getStatementText()))
-        .close();
     return Command.of(statement);
   }
 
