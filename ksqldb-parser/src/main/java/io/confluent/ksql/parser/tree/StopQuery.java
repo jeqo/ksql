@@ -22,10 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Immutable
-public final class StopQuery extends Statement {
-
-  public static final String ALL_QUERIES = "ALL";
-  private final Optional<QueryId> queryId;
+public final class StopQuery extends QueryControlStatement {
 
   public static StopQuery all(final Optional<NodeLocation> location) {
     return new StopQuery(location, Optional.empty());
@@ -36,15 +33,7 @@ public final class StopQuery extends Statement {
   }
 
   private StopQuery(final Optional<NodeLocation> location, final Optional<QueryId> queryId) {
-    super(location);
-    this.queryId = Objects.requireNonNull(queryId, "queryId");
-  }
-
-  /**
-   * @return the id of the query to terminate or {@code empty()} if all should be terminated.
-   */
-  public Optional<QueryId> getQueryId() {
-    return queryId;
+    super(location, queryId);
   }
 
   @Override
