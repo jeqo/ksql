@@ -27,7 +27,9 @@ import io.confluent.ksql.parser.tree.DropStream;
 import io.confluent.ksql.parser.tree.DropTable;
 import io.confluent.ksql.parser.tree.InsertInto;
 import io.confluent.ksql.parser.tree.RegisterType;
+import io.confluent.ksql.parser.tree.StartQuery;
 import io.confluent.ksql.parser.tree.Statement;
+import io.confluent.ksql.parser.tree.StopQuery;
 import io.confluent.ksql.parser.tree.TerminateQuery;
 import io.confluent.ksql.query.QueryId;
 import io.confluent.ksql.rest.entity.CommandId;
@@ -60,6 +62,10 @@ public class CommandIdAssigner {
             command -> getInsertIntoCommandId((InsertInto) command))
           .put(TerminateQuery.class,
             command -> getTerminateCommandId((TerminateQuery) command))
+          .put(StartQuery.class,
+              command -> getStartCommandId((StartQuery) command))
+          .put(StopQuery.class,
+              command -> getStopCommandId((StopQuery) command))
           .put(DropStream.class,
             command -> getDropStreamCommandId((DropStream) command))
           .put(DropTable.class,
@@ -114,6 +120,22 @@ public class CommandIdAssigner {
     return new CommandId(
         CommandId.Type.TERMINATE,
         terminateQuery.getQueryId().map(QueryId::toString).orElse(TerminateQuery.ALL_QUERIES),
+        CommandId.Action.EXECUTE
+    );
+  }
+
+  private static CommandId getStartCommandId(final StartQuery startQuery) {
+    return new CommandId(
+        CommandId.Type.START,
+        startQuery.getQueryId().map(QueryId::toString).orElse(StartQuery.ALL_QUERIES),
+        CommandId.Action.EXECUTE
+    );
+  }
+
+  private static CommandId getStopCommandId(final StopQuery stopQuery) {
+    return new CommandId(
+        CommandId.Type.STOP,
+        stopQuery.getQueryId().map(QueryId::toString).orElse(StopQuery.ALL_QUERIES),
         CommandId.Action.EXECUTE
     );
   }

@@ -25,6 +25,7 @@ import io.confluent.ksql.parser.KsqlParser.ParsedStatement;
 import io.confluent.ksql.parser.KsqlParser.PreparedStatement;
 import io.confluent.ksql.parser.tree.CreateAsSelect;
 import io.confluent.ksql.parser.tree.InsertInto;
+import io.confluent.ksql.parser.tree.QueryControlStatement;
 import io.confluent.ksql.parser.tree.Statement;
 import io.confluent.ksql.parser.tree.TerminateQuery;
 import io.confluent.ksql.rest.SessionProperties;
@@ -160,7 +161,7 @@ public class RequestValidator {
       customValidator
           .validate(configured, sessionProperties, executionContext, serviceContext);
     } else if (KsqlEngine.isExecutableStatement(configured.getStatement())
-        || configured.getStatement() instanceof TerminateQuery) {
+        || configured.getStatement() instanceof QueryControlStatement) {
       final ConfiguredStatement<?> statementInjected = injector.inject(configured);
       distributedStatementValidator.create(statementInjected, serviceContext, executionContext);
     } else {

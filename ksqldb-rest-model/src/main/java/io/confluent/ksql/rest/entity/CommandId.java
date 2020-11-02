@@ -35,6 +35,8 @@ public class CommandId {
     TABLE,
     CLUSTER,
     TERMINATE,
+    START,
+    STOP,
     TYPE
   }
 

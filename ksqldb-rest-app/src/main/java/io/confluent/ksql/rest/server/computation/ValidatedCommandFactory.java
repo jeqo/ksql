@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.confluent.ksql.KsqlExecutionContext;
 import io.confluent.ksql.engine.KsqlPlan;
 import io.confluent.ksql.execution.json.PlanJsonMapper;
+import io.confluent.ksql.parser.tree.QueryControlStatement;
 import io.confluent.ksql.parser.tree.StartQuery;
 import io.confluent.ksql.parser.tree.Statement;
 import io.confluent.ksql.parser.tree.StopQuery;
@@ -101,9 +102,7 @@ public final class ValidatedCommandFactory {
       return Command.of(statement);
     }
 
-    if (statement.getStatement() instanceof TerminateQuery ||
-        statement.getStatement() instanceof StartQuery ||
-        statement.getStatement() instanceof StopQuery) {
+    if (statement.getStatement() instanceof QueryControlStatement) {
       return createForControlQuery(statement, context);
     }
 

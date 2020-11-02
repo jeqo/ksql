@@ -25,6 +25,9 @@ import io.confluent.ksql.parser.KsqlParser.PreparedStatement;
 import io.confluent.ksql.parser.tree.CreateAsSelect;
 import io.confluent.ksql.parser.tree.ExecutableDdlStatement;
 import io.confluent.ksql.parser.tree.InsertInto;
+import io.confluent.ksql.parser.tree.QueryControlStatement;
+import io.confluent.ksql.parser.tree.StartQuery;
+import io.confluent.ksql.parser.tree.StopQuery;
 import io.confluent.ksql.parser.tree.TerminateQuery;
 import io.confluent.ksql.planner.plan.ConfiguredKsqlPlan;
 import io.confluent.ksql.query.QueryId;
@@ -267,14 +270,34 @@ public class InteractiveStatementExecutor implements KsqlConfigurable {
       final CommandId commandId,
       final Optional<CommandStatusFuture> commandStatusFuture
   ) {
-    if (statement.getStatement() instanceof TerminateQuery) {
-      terminateQuery((PreparedStatement<TerminateQuery>) statement);
+    if (statement.getStatement() instanceof QueryControlStatement) {
+      if (statement.getStatement() instanceof TerminateQuery) {
+        terminateQuery((PreparedStatement<TerminateQuery>) statement);
 
-      final String successMessage = "Query terminated.";
-      final CommandStatus successStatus =
-          new CommandStatus(CommandStatus.Status.SUCCESS, successMessage, Optional.empty());
+        final String successMessage = "Query terminated.";
+        final CommandStatus successStatus =
+            new CommandStatus(CommandStatus.Status.SUCCESS, successMessage, Optional.empty());
 
-      putFinalStatus(commandId, commandStatusFuture, successStatus);
+        putFinalStatus(commandId, commandStatusFuture, successStatus);
+      } else
+      if (statement.getStatement() instanceof StartQuery) {
+        startQuery((PreparedStatement<StartQuery>) statement);
+
+        final String successMessage = "Query started.";
+        final CommandStatus successStatus =
+            new CommandStatus(CommandStatus.Status.SUCCESS, successMessage, Optional.empty());
+
+        putFinalStatus(commandId, commandStatusFuture, successStatus);
+      } else
+      if (statement.getStatement() instanceof StopQuery) {
+        stopQuery((PreparedStatement<StopQuery>) statement);
+
+        final String successMessage = "Query stopped.";
+        final CommandStatus successStatus =
+            new CommandStatus(CommandStatus.Status.SUCCESS, successMessage, Optional.empty());
+
+        putFinalStatus(commandId, commandStatusFuture, successStatus);
+      }
     } else if (statement.getStatement() instanceof ExecutableDdlStatement) {
       throwUnsupportedStatementError();
     } else if (statement.getStatement() instanceof CreateAsSelect) {
@@ -303,6 +326,30 @@ public class InteractiveStatementExecutor implements KsqlConfigurable {
 
     final Optional<PersistentQueryMetadata> query = ksqlEngine.getPersistentQuery(queryId.get());
     query.ifPresent(PersistentQueryMetadata::close);
+  }
+
+  private void startQuery(final PreparedStatement<StartQuery> startQuery) {
+    final Optional<QueryId> queryId = startQuery.getStatement().getQueryId();
+
+    if (!queryId.isPresent()) {
+      ksqlEngine.getPersistentQueries().forEach(PersistentQueryMetadata::start);
+      return;
+    }
+
+    final Optional<PersistentQueryMetadata> query = ksqlEngine.getPersistentQuery(queryId.get());
+    query.ifPresent(PersistentQueryMetadata::start);
+  }
+
+  private void stopQuery(final PreparedStatement<StopQuery> stopQuery) {
+    final Optional<QueryId> queryId = stopQuery.getStatement().getQueryId();
+
+    if (!queryId.isPresent()) {
+      ksqlEngine.getPersistentQueries().forEach(PersistentQueryMetadata::stop);
+      return;
+    }
+
+    final Optional<PersistentQueryMetadata> query = ksqlEngine.getPersistentQuery(queryId.get());
+    query.ifPresent(PersistentQueryMetadata::stop);
   }
 
   private static void throwUnsupportedStatementError() {
