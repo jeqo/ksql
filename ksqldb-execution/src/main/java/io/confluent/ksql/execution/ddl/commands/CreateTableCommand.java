@@ -29,6 +29,8 @@ import java.util.Optional;
 @Immutable
 public class CreateTableCommand extends CreateSourceCommand {
 
+  private final Optional<Boolean> globalTable;
+
   public CreateTableCommand(
       @JsonProperty(value = "sourceName", required = true) final SourceName sourceName,
       @JsonProperty(value = "schema", required = true) final LogicalSchema schema,
@@ -36,7 +38,8 @@ public class CreateTableCommand extends CreateSourceCommand {
       @JsonProperty(value = "topicName", required = true) final String topicName,
       @JsonProperty(value = "formats", required = true) final Formats formats,
       @JsonProperty(value = "windowInfo") final Optional<WindowInfo> windowInfo,
-      @JsonProperty(value = "orReplace", defaultValue = "false") final Optional<Boolean> orReplace
+      @JsonProperty(value = "orReplace", defaultValue = "false") final Optional<Boolean> orReplace,
+      @JsonProperty(value = "globalTable", defaultValue = "false") final Optional<Boolean> globalTable
   ) {
     super(
         sourceName,
@@ -47,10 +50,15 @@ public class CreateTableCommand extends CreateSourceCommand {
         windowInfo,
         orReplace.orElse(false)
     );
+    this.globalTable = globalTable;
 
     if (schema.key().isEmpty()) {
       throw new UnsupportedOperationException("Tables require key columns");
     }
+  }
+
+  public Optional<Boolean> getGlobalTable() {
+    return globalTable;
   }
 
   @Override

@@ -354,7 +354,8 @@ public final class ListSourceExecutor {
         dataSource.getKsqlTopic().getKafkaTopicName(),
         dataSource.getKsqlTopic().getKeyFormat().getFormat(),
         dataSource.getKsqlTopic().getValueFormat().getFormat(),
-        dataSource.getKsqlTopic().getKeyFormat().isWindowed()
+        dataSource.getKsqlTopic().getKeyFormat().isWindowed(),
+        dataSource.isGlobalTable()
     );
   }
 

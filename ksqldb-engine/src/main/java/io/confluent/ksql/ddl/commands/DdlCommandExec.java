@@ -92,7 +92,8 @@ public class DdlCommandExec {
           createTable.getSchema(),
           createTable.getTimestampColumn(),
           withQuery,
-          getKsqlTopic(createTable)
+          getKsqlTopic(createTable),
+          createTable.getGlobalTable().orElse(Boolean.FALSE)
       );
       metaStore.putSource(ksqlTable, createTable.isOrReplace());
       return new DdlCommandResult(true, "Table created");

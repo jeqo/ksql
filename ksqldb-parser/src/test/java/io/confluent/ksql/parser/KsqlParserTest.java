@@ -176,7 +176,8 @@ public class KsqlParserTest {
         ORDERS_SCHEMA,
         Optional.empty(),
         false,
-        ksqlTopicItems
+        ksqlTopicItems,
+        false
     );
 
     metaStore.putSource(ksqlTableOrders, false);

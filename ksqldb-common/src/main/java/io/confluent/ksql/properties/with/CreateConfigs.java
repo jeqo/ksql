@@ -34,6 +34,7 @@ public final class CreateConfigs {
   public static final String KEY_SCHEMA_ID = "KEY_SCHEMA_ID";
   public static final String VALUE_SCHEMA_ID = "VALUE_SCHEMA_ID";
   public static final String SOURCE_CONNECTOR = "SOURCE_CONNECTOR";
+  public static final String GLOBAL_TABLE = "GLOBAL_TABLE";
 
   private static final ConfigDef CONFIG_DEF = new ConfigDef()
       .define(
@@ -75,6 +76,12 @@ public final class CreateConfigs {
           "Indicates that this source was created by a connector with the given name. This "
               + "is useful for understanding which sources map to which connectors and will "
               + "be automatically populated for connectors."
+      ).define(
+          GLOBAL_TABLE,
+          Type.BOOLEAN,
+          false,
+          Importance.LOW,
+          ""
       );
 
   static {

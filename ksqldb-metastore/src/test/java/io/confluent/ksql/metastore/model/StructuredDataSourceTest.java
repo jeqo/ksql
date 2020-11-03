@@ -211,7 +211,8 @@ public class StructuredDataSourceTest {
         SOME_SCHEMA,
         Optional.empty(),
         true,
-        topic
+        topic,
+        false
     );
 
     // When:

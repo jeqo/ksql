@@ -91,6 +91,8 @@ public abstract class SourceInfo {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Table extends SourceInfo {
 
+    private boolean globalTable;
+
     @Deprecated // Since 0.13 "format" is not being sent. Remove in future release.
     @JsonCreator
     public Table(
@@ -99,15 +101,16 @@ public abstract class SourceInfo {
         @JsonProperty("keyFormat") final Optional<String> keyFormat,
         @JsonProperty("valueFormat") final Optional<String> valueFormat,
         @JsonProperty("isWindowed") final Optional<Boolean> windowed,
-        @JsonProperty("format") final Optional<String> legacyValueFormat
+        @JsonProperty("format") final Optional<String> legacyValueFormat,
+        @JsonProperty("isGlobalTable") final Optional<Boolean> globalTable
     ) {
       this(
           name,
           topic,
           keyFormat.orElse("KAFKA"),
           valueFormat.orElse(legacyValueFormat.orElse("UNKNOWN")),
-          windowed.orElse(false)
-      );
+          windowed.orElse(false),
+          globalTable.orElse(false));
     }
 
     public Table(
@@ -115,9 +118,10 @@ public abstract class SourceInfo {
         final String topic,
         final String keyFormat,
         final String valueFormat,
-        final boolean windowed
-    ) {
+        final boolean windowed,
+        final boolean globalTable) {
       super(name, topic, keyFormat, valueFormat, windowed);
+      this.globalTable = globalTable;
     }
   }
 

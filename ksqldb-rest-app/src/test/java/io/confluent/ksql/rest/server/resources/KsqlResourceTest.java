@@ -2026,7 +2026,8 @@ public class KsqlResourceTest {
         table.getKsqlTopic().getKafkaTopicName(),
         table.getKsqlTopic().getKeyFormat().getFormat(),
         table.getKsqlTopic().getValueFormat().getFormat(),
-        table.getKsqlTopic().getKeyFormat().isWindowed()
+        table.getKsqlTopic().getKeyFormat().isWindowed(),
+        table.isGlobalTable()
     );
   }
 
@@ -2380,7 +2381,8 @@ public class KsqlResourceTest {
               schema,
               Optional.empty(),
               false,
-              ksqlTopic
+              ksqlTopic,
+              false
           ), false);
     }
   }
